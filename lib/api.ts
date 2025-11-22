@@ -8,7 +8,7 @@ const BASE_URL =
 
 // Create Axios instance
 export const API = axios.create({
-  baseURL: BASE_URL,
+  baseURL: "https://task-manager-backend-yea2.onrender.com/api/",
 });
 
 // Request interceptor to attach token
