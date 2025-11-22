@@ -1,22 +1,21 @@
 import axios, { AxiosHeaders } from "axios";
 
-// Determine base URL dynamically
+// Dynamically determine base URL
 const BASE_URL =
   process.env.NODE_ENV === "production"
-    ? process.env.NEXT_PUBLIC_API_BASE
-    : process.env.NEXT_PUBLIC_API_BASE_LOCAL || "http://localhost:5000/api";
+    ? "https://task-manager-backend-yea2.onrender.com/api"
+    : "http://localhost:5000/api";
 
-// Create Axios instance
 export const API = axios.create({
-  baseURL: "https://task-manager-backend-yea2.onrender.com/api/",
+  baseURL: BASE_URL,
 });
 
-// Request interceptor to attach token
+// Attach token for authenticated requests
 API.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token");
     if (token) {
-      // Ensure headers is an AxiosHeaders instance
+      // Ensure headers exist
       if (!config.headers) {
         config.headers = new AxiosHeaders();
       }
@@ -26,5 +25,5 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Export base URL as string if needed elsewhere
+// Export base URL for non-Axios usage if needed
 export const api = BASE_URL;
