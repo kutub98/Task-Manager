@@ -1,8 +1,12 @@
 import axios from "axios";
 
 export const API = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api",
+  baseURL:
+    process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_BASE_local,
 });
+// export const API = axios.create({
+//   baseURL: "https://task-manager-backend-yea2.onrender.com/api/",
+// });
 
 API.interceptors.request.use((cfg) => {
   if (typeof window !== "undefined") {
