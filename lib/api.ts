@@ -1,22 +1,25 @@
 import axios from "axios";
 
-export const API = axios.create({
-  baseURL:
-    process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_BASE_local,
-});
-// export const API = axios.create({
-//   baseURL: "https://task-manager-backend-yea2.onrender.com/api/",
-// });
+const getBaseURL = () => {
+  if (process.env.NODE_ENV === "production") {
+    return process.env.NEXT_PUBLIC_API_BASE; // Production URL
+  }
+  return process.env.NEXT_PUBLIC_API_BASE_LOCAL; // Development URL
+};
 
-API.interceptors.request.use((cfg) => {
+export const API = axios.create({
+  baseURL: getBaseURL(),
+});
+
+API.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token");
-    if (token) {
-      // Use the set method of AxiosRequestHeaders
-      cfg.headers!.Authorization = `Bearer ${token}`;
+    if (token && config.headers) {
+      // Use AxiosHeaders set method
+      config.headers.set("Authorization", `Bearer ${token}`);
     }
   }
-  return cfg;
+  return config;
 });
 
 export const api = "http://localhost:5000/api";
