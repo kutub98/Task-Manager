@@ -7,6 +7,7 @@ import { useAuth } from "@/store/useAuth";
 import { API } from "../lib/api";
 import { motion } from "framer-motion";
 import { FaProjectDiagram, FaTasks, FaUsers } from "react-icons/fa";
+import Link from "next/link";
 
 export default function Page() {
   const { user } = useAuth();
@@ -14,13 +15,7 @@ export default function Page() {
   const [summary, setSummary] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (!user) {
-      // Redirect to login if user is not authenticated
-      router.push("/auth/login");
-    }
-  }, [user, router]);
-
+  // Load dashboard data only if user exists
   const load = async () => {
     try {
       const s = await API.get("/dashboard/summary");
@@ -39,7 +34,7 @@ export default function Page() {
     }
   }, [user]);
 
-  // Animation variants (same as your existing code)
+  // Animation variants
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -54,8 +49,45 @@ export default function Page() {
     }),
   };
 
-  // Don't render dashboard if user is not logged in
-  if (!user) return null;
+  // Professional "Not Logged In" UI
+  if (!user) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-50 to-indigo-100 px-4"
+      >
+        <div className="bg-white shadow-xl rounded-2xl p-10 max-w-md w-full text-center">
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-800">
+              Access Restricted
+            </h1>
+            <p className="text-gray-600 mb-6">
+              You need to log in first to access your dashboard.
+            </p>
+            <div className="flex justify-center gap-4">
+              <Link
+                href="/auth/login"
+                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                Login
+              </Link>
+              <Link
+                href="/auth/register"
+                className="px-6 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
+              >
+                Register
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8 font-sans">
