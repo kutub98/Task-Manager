@@ -2,26 +2,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/store/useAuth";
 import { API } from "../lib/api";
 import { motion } from "framer-motion";
 import { FaProjectDiagram, FaTasks, FaUsers } from "react-icons/fa";
 
 export default function Page() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [summary, setSummary] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
 
+  useEffect(() => {
+    if (!user) {
+      // Redirect to login if user is not authenticated
+      router.push("/auth/login");
+    }
+  }, [user, router]);
+
   const load = async () => {
-    const s = await API.get("/dashboard/summary");
-    setSummary(s.data);
-    const l = await API.get("/dashboard/activity");
-    setLogs(l.data);
+    try {
+      const s = await API.get("/dashboard/summary");
+      setSummary(s.data);
+
+      const l = await API.get("/dashboard/activity");
+      setLogs(l.data);
+    } catch (err) {
+      console.error("Failed to load dashboard data", err);
+    }
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    if (user) {
+      load();
+    }
+  }, [user]);
 
-  // Animation Variants
+  // Animation variants (same as your existing code)
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -35,6 +53,9 @@ export default function Page() {
       transition: { delay: i * 0.1, duration: 0.4 },
     }),
   };
+
+  // Don't render dashboard if user is not logged in
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-gray-50 p-8 font-sans">
